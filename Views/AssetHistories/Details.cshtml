@@ -1,84 +1,110 @@
 ﻿@model Asset.Models.hdAssetHistory
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Asset History Details";
 }
 
-<h1>Details</h1>
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Asset History</a></li>
+                    <li class="breadcrumb-item active">Details</li>
+                </ol>
+            </nav>
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-eye me-2"></i>Asset History Details
+            </h1>
+            <p class="text-muted">View details for history record <strong>#@Model.HistoryID</strong></p>
+        </div>
+    </div>
 
-<div>
-    <h4>hdAssetHistory</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Asset)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Asset.AssetID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ActionType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ActionType.ActionTypeId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SparePart)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SparePart)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PerformedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PerformedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AssignedToUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AssignedToUser)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ActionDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ActionDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedBy)
-        </dd>
-    </dl>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>History Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Asset</dt>
+                        <dd class="col-sm-8 fw-semibold">
+                            <span class="badge bg-primary">@Model.Asset?.AssetID</span>
+                        </dd>
+                        <dt class="col-sm-4 text-muted">Action Type</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-info">@Model.ActionType?.ActionTypeId</span>
+                        </dd>
+                        <dt class="col-sm-4 text-muted">Description</dt>
+                        <dd class="col-sm-8">@Model.Description</dd>
+                        <dt class="col-sm-4 text-muted">Spare Part</dt>
+                        <dd class="col-sm-8">@Model.SparePart</dd>
+                        <dt class="col-sm-4 text-muted">Performed By</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-success">@Model.PerformedBy</span>
+                        </dd>
+                        <dt class="col-sm-4 text-muted">Assigned User</dt>
+                        <dd class="col-sm-8">@Model.AssignedToUser</dd>
+                        <dt class="col-sm-4 text-muted">Action Date</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-light text-dark">@Model.ActionDate.ToString("MMM dd, yyyy")</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Audit Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5 text-muted">Created At</dt>
+                        <dd class="col-sm-7">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</dd>
+                        <dt class="col-sm-5 text-muted">Created By</dt>
+                        <dd class="col-sm-7">@Model.CreatedBy</dd>
+                        <dt class="col-sm-5 text-muted">Updated At</dt>
+                        <dd class="col-sm-7">
+                            @(Model.UpdatedAt?.ToString("MMM dd, yyyy 'at' hh:mm tt") ?? "Never")
+                        </dd>
+                        <dt class="col-sm-5 text-muted">Updated By</dt>
+                        <dd class="col-sm-7">@Model.UpdatedBy</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.HistoryID" class="btn btn-primary">
+                    <i class="bi bi-pencil me-1"></i>Edit
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.HistoryID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@section Scripts {
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        dl.row dt {
+            font-weight: 500;
+        }
+        dl.row dd {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+}

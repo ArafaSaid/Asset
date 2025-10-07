@@ -1,84 +1,190 @@
 ﻿@model Asset.Models.hdAssetHistory
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Asset History";
 }
 
-<h1>Edit</h1>
-
-<h4>hdAssetHistory</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="HistoryID" />
-            <div class="form-group">
-                <label asp-for="AssetID" class="control-label"></label>
-                <select asp-for="AssetID" class="form-control" asp-items="ViewBag.AssetID"></select>
-                <span asp-validation-for="AssetID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ActionTypeId" class="control-label"></label>
-                <select asp-for="ActionTypeId" class="form-control" asp-items="ViewBag.ActionTypeId"></select>
-                <span asp-validation-for="ActionTypeId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SparePart" class="control-label"></label>
-                <input asp-for="SparePart" class="form-control" />
-                <span asp-validation-for="SparePart" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PerformedBy" class="control-label"></label>
-                <input asp-for="PerformedBy" class="form-control" />
-                <span asp-validation-for="PerformedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AssignedToUser" class="control-label"></label>
-                <input asp-for="AssignedToUser" class="form-control" />
-                <span asp-validation-for="AssignedToUser" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ActionDate" class="control-label"></label>
-                <input asp-for="ActionDate" class="form-control" />
-                <span asp-validation-for="ActionDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedBy" class="control-label"></label>
-                <input asp-for="CreatedBy" class="form-control" />
-                <span asp-validation-for="CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control" />
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label"></label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Asset History</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </nav>
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-pencil-square me-2"></i>Edit Asset History
+            </h1>
+            <p class="text-muted">Update information for history record <strong>#@Model.HistoryID</strong></p>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="Edit" id="historyEditForm">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <input type="hidden" asp-for="HistoryID" />
+        <div class="row">
+            <div class="col-lg-6">
+                <!-- Asset & Action Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Asset & Action Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="AssetID" class="form-label fw-semibold">Asset</label>
+                            <select asp-for="AssetID" class="form-select" asp-items="ViewBag.AssetID"></select>
+                            <span asp-validation-for="AssetID" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ActionTypeId" class="form-label fw-semibold">Action Type</label>
+                            <select asp-for="ActionTypeId" class="form-select" asp-items="ViewBag.ActionTypeId"></select>
+                            <span asp-validation-for="ActionTypeId" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="2" placeholder="Describe the action"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="SparePart" class="form-label fw-semibold"></label>
+                            <input asp-for="SparePart" class="form-control" placeholder="Spare part used (if any)" />
+                            <span asp-validation-for="SparePart" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User & Date Info -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-person-check me-2"></i>User & Date Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="PerformedBy" class="form-label fw-semibold"></label>
+                            <input asp-for="PerformedBy" class="form-control" placeholder="Who performed the action?" />
+                            <span asp-validation-for="PerformedBy" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="AssignedToUser" class="form-label fw-semibold"></label>
+                            <input asp-for="AssignedToUser" class="form-control" placeholder="Assigned user (if applicable)" />
+                            <span asp-validation-for="AssignedToUser" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ActionDate" class="form-label fw-semibold"></label>
+                            <input asp-for="ActionDate" class="form-control" type="date" />
+                            <span asp-validation-for="ActionDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <!-- Audit Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Audit Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-sm-6 small text-muted">Created At</div>
+                            <div class="col-sm-6 small">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6 small text-muted">Created By</div>
+                            <div class="col-sm-6 small">@Model.CreatedBy</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6 small text-muted">Last Updated</div>
+                            <div class="col-sm-6 small">
+                                @(Model.UpdatedAt?.ToString("MMM dd, yyyy 'at' hh:mm tt") ?? "Never")
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6 small text-muted">Updated By</div>
+                            <div class="col-sm-6 small">@Model.UpdatedBy</div>
+                        </div>
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Audit fields are automatically managed by the system.
+                        </div>
+                        <input asp-for="CreatedAt" type="hidden" />
+                        <input asp-for="CreatedBy" type="hidden" />
+                        <input asp-for="UpdatedAt" type="hidden" />
+                        <input asp-for="UpdatedBy" type="hidden" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Details" asp-route-id="@Model.HistoryID" class="btn btn-outline-secondary">
+                                <i class="bi bi-eye me-2"></i>View Details
+                            </a>
+                            <div>
+                                <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                                </a>
+                                <button type="reset" class="btn btn-outline-warning me-2">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Reset Changes
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-save me-2"></i>Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .form-label.fw-semibold {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .card-header h5 {
+            font-size: 1rem;
+        }
+    </style>
+
+    <script>
+        // Auto-populate UpdatedAt field
+        document.addEventListener('DOMContentLoaded', function() {
+            const updatedAtField = document.querySelector('input[name="UpdatedAt"]');
+            if (updatedAtField) {
+                updatedAtField.value = new Date().toISOString();
+            }
+        });
+
+        // Form validation feedback
+        document.getElementById('historyEditForm').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    </script>
 }
