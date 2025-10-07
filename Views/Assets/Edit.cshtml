@@ -1,139 +1,420 @@
 ﻿@model Asset.Models.hdAssets
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Asset";
 }
 
-<h1>Edit</h1>
-
-<h4>hdAssets</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AssetID" />
-            <div class="form-group">
-                <label asp-for="ComputerName" class="control-label"></label>
-                <input asp-for="ComputerName" class="form-control" />
-                <span asp-validation-for="ComputerName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TypeID" class="control-label"></label>
-                <select asp-for="TypeID" class="form-control" asp-items="ViewBag.TypeID"></select>
-                <span asp-validation-for="TypeID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SerialNumber" class="control-label"></label>
-                <input asp-for="SerialNumber" class="form-control" />
-                <span asp-validation-for="SerialNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Model" class="control-label"></label>
-                <input asp-for="Model" class="form-control" />
-                <span asp-validation-for="Model" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Manufacturer" class="control-label"></label>
-                <input asp-for="Manufacturer" class="form-control" />
-                <span asp-validation-for="Manufacturer" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Supplier" class="control-label"></label>
-                <input asp-for="Supplier" class="form-control" />
-                <span asp-validation-for="Supplier" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Processor" class="control-label"></label>
-                <input asp-for="Processor" class="form-control" />
-                <span asp-validation-for="Processor" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RAM" class="control-label"></label>
-                <input asp-for="RAM" class="form-control" />
-                <span asp-validation-for="RAM" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Storage" class="control-label"></label>
-                <input asp-for="Storage" class="form-control" />
-                <span asp-validation-for="Storage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OS" class="control-label"></label>
-                <input asp-for="OS" class="form-control" />
-                <span asp-validation-for="OS" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Monitor" class="control-label"></label>
-                <input asp-for="Monitor" class="form-control" />
-                <span asp-validation-for="Monitor" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Printer" class="control-label"></label>
-                <input asp-for="Printer" class="form-control" />
-                <span asp-validation-for="Printer" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PurchaseDate" class="control-label"></label>
-                <input asp-for="PurchaseDate" class="form-control" />
-                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PurchasePrice" class="control-label"></label>
-                <input asp-for="PurchasePrice" class="form-control" />
-                <span asp-validation-for="PurchasePrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WarrantyExpirationDate" class="control-label"></label>
-                <input asp-for="WarrantyExpirationDate" class="form-control" />
-                <span asp-validation-for="WarrantyExpirationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StatusId" class="control-label"></label>
-                <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
-                <span asp-validation-for="StatusId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedBy" class="control-label"></label>
-                <input asp-for="CreatedBy" class="form-control" />
-                <span asp-validation-for="CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control" />
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label"></label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Assets</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.AssetID">@Model.ComputerName</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </nav>
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-pencil-square me-2"></i>Edit Asset
+            </h1>
+            <p class="text-muted">Update information for <strong>@Model.ComputerName</strong></p>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="Edit" id="assetEditForm">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <input type="hidden" asp-for="AssetID" />
+
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-6">
+                <!-- Basic Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ComputerName" class="form-label fw-semibold"></label>
+                                <input asp-for="ComputerName" class="form-control" placeholder="Enter computer name" />
+                                <span asp-validation-for="ComputerName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="UserName" class="form-label fw-semibold"></label>
+                                <input asp-for="UserName" class="form-control" placeholder="Enter user name" />
+                                <span asp-validation-for="UserName" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="TypeID" class="form-label fw-semibold">Asset Type</label>
+                                <select asp-for="TypeID" class="form-select" asp-items="ViewBag.TypeID">
+                                    <option value="">-- Select Type --</option>
+                                </select>
+                                <span asp-validation-for="TypeID" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SerialNumber" class="form-label fw-semibold"></label>
+                                <input asp-for="SerialNumber" class="form-control" placeholder="Enter serial number" />
+                                <span asp-validation-for="SerialNumber" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Manufacturer" class="form-label fw-semibold"></label>
+                                <input asp-for="Manufacturer" class="form-control" placeholder="e.g., Dell, HP" />
+                                <span asp-validation-for="Manufacturer" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Model" class="form-label fw-semibold"></label>
+                                <input asp-for="Model" class="form-control" placeholder="Model number" />
+                                <span asp-validation-for="Model" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Supplier" class="form-label fw-semibold"></label>
+                                <input asp-for="Supplier" class="form-control" placeholder="Supplier name" />
+                                <span asp-validation-for="Supplier" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Specifications -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-cpu me-2"></i>Technical Specifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Processor" class="form-label fw-semibold"></label>
+                                <input asp-for="Processor" class="form-control" placeholder="e.g., Intel i7-12700" />
+                                <span asp-validation-for="Processor" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RAM" class="form-label fw-semibold"></label>
+                                <input asp-for="RAM" class="form-control" placeholder="e.g., 16GB DDR4" />
+                                <span asp-validation-for="RAM" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Storage" class="form-label fw-semibold"></label>
+                                <input asp-for="Storage" class="form-control" placeholder="e.g., 512GB SSD" />
+                                <span asp-validation-for="Storage" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OS" class="form-label fw-semibold">Operating System</label>
+                                <input asp-for="OS" class="form-control" placeholder="e.g., Windows 11 Pro" />
+                                <span asp-validation-for="OS" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Peripherals -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-display me-2"></i>Peripherals</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Monitor" class="form-label fw-semibold"></label>
+                                <input asp-for="Monitor" class="form-control" placeholder="Monitor details" />
+                                <span asp-validation-for="Monitor" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Printer" class="form-label fw-semibold"></label>
+                                <input asp-for="Printer" class="form-control" placeholder="Printer details" />
+                                <span asp-validation-for="Printer" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-6">
+                <!-- Purchase Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-cart me-2"></i>Purchase Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PurchaseDate" class="form-label fw-semibold"></label>
+                                <input asp-for="PurchaseDate" class="form-control" type="date" />
+                                <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PurchasePrice" class="form-label fw-semibold"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="PurchasePrice" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="PurchasePrice" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="WarrantyExpirationDate" class="form-label fw-semibold"></label>
+                            <input asp-for="WarrantyExpirationDate" class="form-control" type="date" id="warrantyDate" />
+                            <span asp-validation-for="WarrantyExpirationDate" class="text-danger small"></span>
+                            <div class="form-text" id="warrantyStatus">
+                                <i class="bi bi-info-circle me-1"></i>Check warranty expiration status
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Status -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Location & Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label fw-semibold"></label>
+                            <input asp-for="Location" class="form-control" placeholder="e.g., Building A - Room 101" />
+                            <span asp-validation-for="Location" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="StatusId" class="form-label fw-semibold">Status</label>
+                            <select asp-for="StatusId" class="form-select" asp-items="ViewBag.StatusId">
+                                <option value="">-- Select Status --</option>
+                            </select>
+                            <span asp-validation-for="StatusId" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Information -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Audit Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-3">
+                            <dt class="col-sm-4 text-muted small">Created</dt>
+                            <dd class="col-sm-8 small">
+                                @Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt") by @Model.CreatedBy
+                            </dd>
+                            <dt class="col-sm-4 text-muted small">Last Updated</dt>
+                            <dd class="col-sm-8 small">
+                                @(Model.UpdatedAt?.ToString("MMM dd, yyyy 'at' hh:mm tt") ?? "Never")
+                                @if (Model.UpdatedBy != null)
+                                {
+                                    <text>by @Model.UpdatedBy</text>
+                                }
+                            </dd>
+                        </dl>
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <small>Updated timestamp will be automatically recorded upon saving.</small>
+                        </div>
+                        <!-- Hidden fields for audit information -->
+                        <input asp-for="CreatedAt" type="hidden" />
+                        <input asp-for="CreatedBy" type="hidden" />
+                        <input asp-for="UpdatedAt" type="hidden" />
+                        <input asp-for="UpdatedBy" type="hidden" />
+                    </div>
+                </div>
+
+                <!-- Change Summary -->
+                <div class="card border-0 shadow-sm mb-4 d-none" id="changeSummary">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Unsaved Changes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-2">You have made changes to the following fields:</p>
+                        <ul class="small mb-0" id="changedFieldsList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a asp-action="Details" asp-route-id="@Model.AssetID" class="btn btn-outline-secondary">
+                                    <i class="bi bi-eye me-2"></i>View Details
+                                </a>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                                </a>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-warning me-2" onclick="resetForm()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Reset Changes
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-save me-2"></i>Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-2px);
+            }
+
+        .form-label.fw-semibold {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .form-control.changed,
+        .form-select.changed {
+            border-left: 3px solid #ffc107;
+            background-color: #fffbf0;
+        }
+
+        .card-header h5 {
+            font-size: 1rem;
+        }
+    </style>
+
+    <script>
+        // Store original values to track changes
+        const originalValues = {};
+        const form = document.getElementById('assetEditForm');
+
+        // Initialize original values
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update timestamp
+            const updatedAtField = document.querySelector('input[name="UpdatedAt"]');
+            if (updatedAtField) {
+                updatedAtField.value = new Date().toISOString();
+            }
+
+            // Store original values
+            const inputs = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
+            inputs.forEach(input => {
+                originalValues[input.name] = input.value;
+            });
+
+            // Check warranty status
+            checkWarrantyStatus();
+        });
+
+        // Track changes
+        form.addEventListener('input', function(e) {
+            if (e.target.name && e.target.name in originalValues) {
+                if (e.target.value !== originalValues[e.target.name]) {
+                    e.target.classList.add('changed');
+                    updateChangeSummary();
+                } else {
+                    e.target.classList.remove('changed');
+                    updateChangeSummary();
+                }
+            }
+        });
+
+        // Update change summary
+        function updateChangeSummary() {
+            const changedFields = Array.from(form.querySelectorAll('.changed'));
+            const summaryCard = document.getElementById('changeSummary');
+            const fieldsList = document.getElementById('changedFieldsList');
+
+            if (changedFields.length > 0) {
+                summaryCard.classList.remove('d-none');
+                fieldsList.innerHTML = changedFields
+                    .map(field => {
+                        const label = form.querySelector(`label[for="${field.id}"]`)?.textContent || field.name;
+                        return `<li>${label}</li>`;
+                    })
+                    .join('');
+            } else {
+                summaryCard.classList.add('d-none');
+            }
+        }
+
+        // Reset form to original values
+        function resetForm() {
+            if (confirm('Are you sure you want to discard all changes?')) {
+                Object.keys(originalValues).forEach(name => {
+                    const input = form.querySelector(`[name="${name}"]`);
+                    if (input) {
+                        input.value = originalValues[name];
+                        input.classList.remove('changed');
+                    }
+                });
+                updateChangeSummary();
+            }
+        }
+
+        // Check warranty status
+        function checkWarrantyStatus() {
+            const warrantyInput = document.getElementById('warrantyDate');
+            const warrantyStatus = document.getElementById('warrantyStatus');
+
+            if (warrantyInput && warrantyInput.value) {
+                const warrantyDate = new Date(warrantyInput.value);
+                const today = new Date();
+                const daysLeft = Math.ceil((warrantyDate - today) / (1000 * 60 * 60 * 24));
+
+                if (daysLeft < 0) {
+                    warrantyStatus.innerHTML = '<i class="bi bi-x-circle text-danger me-1"></i><span class="text-danger">Warranty expired ' + Math.abs(daysLeft) + ' days ago</span>';
+                } else if (daysLeft <= 90) {
+                    warrantyStatus.innerHTML = '<i class="bi bi-exclamation-triangle text-warning me-1"></i><span class="text-warning">Warranty expiring in ' + daysLeft + ' days</span>';
+                } else {
+                    warrantyStatus.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i><span class="text-success">Warranty valid for ' + daysLeft + ' days</span>';
+                }
+            }
+        }
+
+        // Add event listener for warranty date changes
+        document.getElementById('warrantyDate')?.addEventListener('change', checkWarrantyStatus);
+
+        // Warn before leaving with unsaved changes
+        let formSubmitted = false;
+        form.addEventListener('submit', function() {
+            formSubmitted = true;
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            const changedFields = form.querySelectorAll('.changed');
+            if (changedFields.length > 0 && !formSubmitted) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+
+        // Form validation feedback
+        form.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    </script>
 }
