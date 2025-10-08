@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Asset.Data;
 using Asset.Models;
+using Asset.Models.hi
 
 namespace Asset.Controllers
 {
@@ -22,8 +23,128 @@ namespace Asset.Controllers
         // GET: AssetHistories
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.AssetHistories.Include(h => h.ActionType).Include(h => h.Asset);
+            var applicationDbContext = _context.AssetHistories
+                .Include(h => h.ActionType)
+                .Include(h => h.Asset)
+                .OrderByDescending(h => h.ActionDate)
+                .ThenByDescending(h => h.CreatedAt);
             return View(await applicationDbContext.ToListAsync());
+        }
+
+        // GET: AssetHistories/Create
+        public IActionResult Create(int? assetId, int? actionTypeId)
+        {
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", actionTypeId);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId ?? 0,
+                ActionTypeId = actionTypeId ?? 0
+            };
+            
+            return View(model);
+        }
+
+        // POST: AssetHistories/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("HistoryID,AssetID,ActionTypeId,Description,SparePart,PerformedBy,AssignedToUser,ActionDate,CreatedBy")] hdAssetHistory hdAssetHistory)
+        {
+            if (ModelState.IsValid)
+            {
+                hdAssetHistory.CreatedAt = DateTime.UtcNow;
+                hdAssetHistory.CreatedBy = User.Identity?.Name ?? "System";
+                
+                _context.Add(hdAssetHistory);
+                
+                // Update asset based on action type
+                await UpdateAssetFromHistory(hdAssetHistory);
+                
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", hdAssetHistory.ActionTypeId);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", hdAssetHistory.AssetID);
+            
+            return View(hdAssetHistory);
+        }
+
+        // Helper method to update asset based on history action
+        private async Task UpdateAssetFromHistory(hdAssetHistory history)
+        {
+            var asset = await _context.Assets.FindAsync(history.AssetID);
+            if (asset == null) return;
+
+            switch (history.ActionTypeId)
+            {
+                case HistoryActionHelper.USER_CHANGE:
+                case HistoryActionHelper.DEPLOYMENT:
+                case HistoryActionHelper.ASSIGNMENT:
+                    if (!string.IsNullOrEmpty(history.AssignedToUser))
+                    {
+                        asset.UserName = history.AssignedToUser;
+                        asset.StatusId = 1; // Active
+                    }
+                    break;
+
+                case HistoryActionHelper.RETURN_TO_IT:
+                    asset.UserName = "IT Department";
+                    asset.StatusId = 2; // Inactive
+                    break;
+
+                case HistoryActionHelper.RETIRED:
+                    asset.StatusId = 4; // Retired
+                    break;
+
+                case HistoryActionHelper.MAINTENANCE:
+                case HistoryActionHelper.REPAIR:
+                    asset.StatusId = 3; // Under Maintenance
+                    break;
+
+                case HistoryActionHelper.HARDWARE_ADDITION:
+                case HistoryActionHelper.UPGRADE:
+                    // Update hardware specs if needed
+                    if (!string.IsNullOrEmpty(history.SparePart))
+                    {
+                        asset.UpdatedAt = DateTime.UtcNow;
+                        asset.UpdatedBy = history.PerformedBy;
+                    }
+                    break;
+            }
+
+            asset.UpdatedAt = DateTime.UtcNow;
+            asset.UpdatedBy = history.PerformedBy;
+            _context.Update(asset);
+        }
+
+        // Quick action methods for common operations
+        public async Task<IActionResult> ChangeUser(int assetId)
+        {
+            return await Create(assetId, HistoryActionHelper.USER_CHANGE);
+        }
+
+        public async Task<IActionResult> AddHardware(int assetId)
+        {
+            return await Create(assetId, HistoryActionHelper.HARDWARE_ADDITION);
+        }
+
+        public async Task<IActionResult> ReturnToIT(int assetId)
+        {
+            return await Create(assetId, HistoryActionHelper.RETURN_TO_IT);
+        }
+
+        public async Task<IActionResult> RetireAsset(int assetId)
+        {
+            return await Create(assetId, HistoryActionHelper.RETIRED);
         }
 
         // GET: AssetHistories/Details/5
@@ -46,32 +167,6 @@ namespace Asset.Controllers
             return View(hdAssetHistory);
         }
 
-        // GET: AssetHistories/Create
-        public IActionResult Create()
-        {
-            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name");
-            ViewData["AssetID"] = new SelectList(_context.Assets, "AssetID", "AssetID");
-            return View();
-        }
-
-        // POST: AssetHistories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("HistoryID,AssetID,ActionTypeId,Description,SparePart,PerformedBy,AssignedToUser,ActionDate,CreatedAt,CreatedBy,UpdatedAt,UpdatedBy")] hdAssetHistory hdAssetHistory)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(hdAssetHistory);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", hdAssetHistory.ActionTypeId);
-            ViewData["AssetID"] = new SelectList(_context.Assets, "AssetID", "AssetID", hdAssetHistory.AssetID);
-            return View(hdAssetHistory);
-        }
-
         // GET: AssetHistories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -86,16 +181,17 @@ namespace Asset.Controllers
                 return NotFound();
             }
             ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", hdAssetHistory.ActionTypeId);
-            ViewData["AssetID"] = new SelectList(_context.Assets, "AssetID", "AssetID", hdAssetHistory.AssetID);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", hdAssetHistory.AssetID);
             return View(hdAssetHistory);
         }
 
         // POST: AssetHistories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("HistoryID,AssetID,ActionTypeId,Description,SparePart,PerformedBy,AssignedToUser,ActionDate,CreatedAt,CreatedBy,UpdatedAt,UpdatedBy")] hdAssetHistory hdAssetHistory)
+        public async Task<IActionResult> Edit(int id, [Bind("HistoryID,AssetID,ActionTypeId,Description,SparePart,PerformedBy,AssignedToUser,ActionDate,CreatedAt,CreatedBy,UpdatedBy")] hdAssetHistory hdAssetHistory)
         {
             if (id != hdAssetHistory.HistoryID)
             {
@@ -106,6 +202,8 @@ namespace Asset.Controllers
             {
                 try
                 {
+                    hdAssetHistory.UpdatedAt = DateTime.UtcNow;
+                    hdAssetHistory.UpdatedBy = User.Identity?.Name ?? "System";
                     _context.Update(hdAssetHistory);
                     await _context.SaveChangesAsync();
                 }
@@ -123,7 +221,10 @@ namespace Asset.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", hdAssetHistory.ActionTypeId);
-            ViewData["AssetID"] = new SelectList(_context.Assets, "AssetID", "AssetID", hdAssetHistory.AssetID);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", hdAssetHistory.AssetID);
             return View(hdAssetHistory);
         }
 
