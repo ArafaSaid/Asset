@@ -1,15 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Asset.Data;
+using Asset.Models;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Asset.Data;
-using Asset.Models;
 
 namespace Asset.Controllers
 {
+    public class AssetExportDto
+    {
+        public int AssetID { get; set; }
+        public string ComputerName { get; set; }
+        public string UserName { get; set; }
+        public string TypeName { get; set; }
+        public string SerialNumber { get; set; }
+        public string Model { get; set; }
+        public string Manufacturer { get; set; }
+        public string Supplier { get; set; }
+        public string Processor { get; set; }
+        public string RAM { get; set; }
+        public string Storage { get; set; }
+        public string OS { get; set; }
+        public string Monitor { get; set; }
+        public string Printer { get; set; }
+        public DateTime PurchaseDate { get; set; }
+        public decimal? PurchasePrice { get; set; }
+        public DateTime? WarrantyExpirationDate { get; set; }
+        public string Location { get; set; }
+        public string StatusName { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public string UpdatedBy { get; set; }
+    }
+
+    public class AssetImportDto
+    {
+        public int AssetID { get; set; }
+        public string ComputerName { get; set; }
+        public string UserName { get; set; }
+        public string TypeName { get; set; }
+        public string SerialNumber { get; set; }
+        public string Model { get; set; }
+        public string Manufacturer { get; set; }
+        public string Supplier { get; set; }
+        public string Processor { get; set; }
+        public string RAM { get; set; }
+        public string Storage { get; set; }
+        public string OS { get; set; }
+        public string Monitor { get; set; }
+        public string Printer { get; set; }
+        public DateTime PurchaseDate { get; set; }
+        public decimal? PurchasePrice { get; set; }
+        public DateTime? WarrantyExpirationDate { get; set; }
+        public string Location { get; set; }
+        public string StatusName { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public string UpdatedBy { get; set; }
+    }
+
     public class AssetsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -165,6 +225,116 @@ namespace Asset.Controllers
         private bool hdAssetsExists(int id)
         {
             return _context.Assets.Any(e => e.AssetID == id);
+        }
+
+        public IActionResult Dashboard()
+        {
+            // You may want to filter or include related data as needed
+            var assets = _context.Assets.Include(h => h.hdAssetTypes).Include(h => h.Status).ToList();
+            return View(assets);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportCsv()
+        {
+            var assets = await _context.Assets.Include(h => h.hdAssetTypes).Include(h => h.Status).ToListAsync();
+            var exportList = assets.Select(a => new AssetExportDto
+            {
+                AssetID = a.AssetID,
+                ComputerName = a.ComputerName,
+                UserName = a.UserName,
+                TypeName = a.hdAssetTypes?.Name,
+                SerialNumber = a.SerialNumber,
+                Model = a.Model,
+                Manufacturer = a.Manufacturer,
+                Supplier = a.Supplier,
+                Processor = a.Processor,
+                RAM = a.RAM,
+                Storage = a.Storage,
+                OS = a.OS,
+                Monitor = a.Monitor,
+                Printer = a.Printer,
+                PurchaseDate = a.PurchaseDate,
+                PurchasePrice = a.PurchasePrice,
+                WarrantyExpirationDate = a.WarrantyExpirationDate,
+                Location = a.Location,
+                StatusName = a.Status?.Name,
+                CreatedAt = a.CreatedAt,
+                CreatedBy = a.CreatedBy,
+                UpdatedAt = a.UpdatedAt,
+                UpdatedBy = a.UpdatedBy
+            }).ToList();
+            var stream = new MemoryStream();
+            using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(exportList);
+            }
+            stream.Position = 0;
+            return File(stream, "text/csv", "assets_export.csv");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportCsv(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ImportError"] = "No file selected.";
+                return RedirectToAction("Index");
+            }
+            using (var stream = file.OpenReadStream())
+            using (var reader = new StreamReader(stream))
+            {
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HeaderValidated = null,
+                    MissingFieldFound = null
+                };
+                using (var csv = new CsvReader(reader, config))
+                {
+                    var records = csv.GetRecords<AssetImportDto>().ToList();
+                    foreach (var dto in records)
+                    {
+                        // Lookup TypeID and StatusId from names
+                        var type = await _context.AssetTypes.FirstOrDefaultAsync(t => t.Name == dto.TypeName);
+                        var status = await _context.AssetStatuses.FirstOrDefaultAsync(s => s.Name == dto.StatusName);
+                        if (type == null || status == null)
+                            continue; // skip if type/status not found
+                        var asset = new hdAssets
+                        {
+                            // AssetID is NOT set here, let DB assign it
+                            ComputerName = dto.ComputerName,
+                            UserName = dto.UserName,
+                            TypeID = type.TypeID,
+                            SerialNumber = dto.SerialNumber,
+                            Model = dto.Model,
+                            Manufacturer = dto.Manufacturer,
+                            Supplier = dto.Supplier,
+                            Processor = dto.Processor,
+                            RAM = dto.RAM,
+                            Storage = dto.Storage,
+                            OS = dto.OS,
+                            Monitor = dto.Monitor,
+                            Printer = dto.Printer,
+                            PurchaseDate = dto.PurchaseDate,
+                            PurchasePrice = dto.PurchasePrice,
+                            WarrantyExpirationDate = dto.WarrantyExpirationDate,
+                            Location = dto.Location,
+                            StatusId = status.StatusId,
+                            CreatedAt = dto.CreatedAt,
+                            CreatedBy = dto.CreatedBy,
+                            UpdatedAt = dto.UpdatedAt,
+                            UpdatedBy = dto.UpdatedBy
+                        };
+                        // Optionally check for duplicates by SerialNumber or ComputerName
+                        if (!_context.Assets.Any(a => a.SerialNumber == asset.SerialNumber && !string.IsNullOrEmpty(asset.SerialNumber)))
+                            _context.Assets.Add(asset);
+                    }
+                    await _context.SaveChangesAsync();
+                }
+            }
+            TempData["ImportSuccess"] = "Assets imported successfully.";
+            return RedirectToAction("Index");
         }
     }
 }

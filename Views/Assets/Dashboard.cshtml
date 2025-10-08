@@ -1,0 +1,146 @@
+@model IEnumerable<Asset.Models.hdAssets>
+
+@{
+    ViewData["Title"] = "Assets Dashboard";
+    // Prepare chart data for asset type distribution
+    var typeGroups = Model.GroupBy(a => a.hdAssetTypes?.Name ?? "Unknown")
+        .Select(g => new { Type = g.Key, Count = g.Count() }).ToList();
+    var typeLabels = string.Join(",", typeGroups.Select(g => "'" + g.Type + "'"));
+    var typeCounts = string.Join(",", typeGroups.Select(g => g.Count));
+    // Prepare chart data for warranty status
+    var warrantyActive = Model.Count(a => a.WarrantyExpirationDate.HasValue && a.WarrantyExpirationDate.Value > DateTime.Now);
+    var warrantyExpiring = Model.Count(a => a.WarrantyExpirationDate.HasValue && a.WarrantyExpirationDate.Value <= DateTime.Now.AddMonths(3) && a.WarrantyExpirationDate.Value > DateTime.Now);
+    var warrantyExpired = Model.Count(a => a.WarrantyExpirationDate.HasValue && a.WarrantyExpirationDate.Value <= DateTime.Now);
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-bar-chart me-2"></i>Assets Dashboard
+            </h1>
+            <p class="text-muted">Visualize asset distribution and warranty status</p>
+        </div>
+    </div>
+
+    <!-- Dashboard Charts -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Asset Distribution by Type</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="typeChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Warranty Status</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="warrantyChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Assets</h6>
+                    <h3 class="fw-bold text-primary">@Model.Count()</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Active</h6>
+                    <h3 class="fw-bold text-success">@Model.Count(a => a.Status?.StatusId == 1)</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Warranty Expiring</h6>
+                    <h3 class="fw-bold text-warning">@Model.Count(a => a.WarrantyExpirationDate.HasValue && a.WarrantyExpirationDate.Value <= DateTime.Now.AddMonths(3))</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Value</h6>
+                    <h3 class="fw-bold text-info">@Model.Sum(a => a.PurchasePrice ?? 0).ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+    <script>
+        // Chart.js: Asset Distribution by Type
+        const typeCtx = document.getElementById('typeChart').getContext('2d');
+        new Chart(typeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [@Html.Raw(typeLabels)],
+                datasets: [{
+                    data: [@Html.Raw(typeCounts)],
+                    backgroundColor: [
+                        '#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d', '#20c997', '#6610f2', '#fd7e14'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: false }
+                }
+            }
+        });
+        // Chart.js: Warranty Status
+        const warrantyCtx = document.getElementById('warrantyChart').getContext('2d');
+        new Chart(warrantyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Active', 'Expiring Soon', 'Expired'],
+                datasets: [{
+                    label: 'Assets',
+                    data: [@warrantyActive, @warrantyExpiring, @warrantyExpired],
+                    backgroundColor: [
+                        '#198754', '#ffc107', '#dc3545'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}
