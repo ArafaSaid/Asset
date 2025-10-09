@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Asset.Data;
 using Asset.Models;
-using Asset.Models.hi
 
 namespace Asset.Controllers
 {
@@ -127,24 +126,24 @@ namespace Asset.Controllers
         }
 
         // Quick action methods for common operations
-        public async Task<IActionResult> ChangeUser(int assetId)
+        public IActionResult ChangeUser(int assetId)
         {
-            return await Create(assetId, HistoryActionHelper.USER_CHANGE);
+            return Create(assetId, HistoryActionHelper.USER_CHANGE);
         }
 
-        public async Task<IActionResult> AddHardware(int assetId)
+        public IActionResult AddHardware(int assetId)
         {
-            return await Create(assetId, HistoryActionHelper.HARDWARE_ADDITION);
+            return Create(assetId, HistoryActionHelper.HARDWARE_ADDITION);
         }
 
-        public async Task<IActionResult> ReturnToIT(int assetId)
+        public IActionResult ReturnToIT(int assetId)
         {
-            return await Create(assetId, HistoryActionHelper.RETURN_TO_IT);
+            return Create(assetId, HistoryActionHelper.RETURN_TO_IT);
         }
 
-        public async Task<IActionResult> RetireAsset(int assetId)
+        public IActionResult RetireAsset(int assetId)
         {
-            return await Create(assetId, HistoryActionHelper.RETIRED);
+            return Create(assetId, HistoryActionHelper.RETIRED);
         }
 
         // GET: AssetHistories/Details/5
