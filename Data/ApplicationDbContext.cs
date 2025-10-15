@@ -65,6 +65,13 @@ namespace Asset.Data
                 new AssetActionType { ActionTypeId = 3, Name = "Spare Part Replacement", Description = "Replaced a part of the asset" },
                 new AssetActionType { ActionTypeId = 4, Name = "Assignment", Description = "New asset assignment" }
             );
+
+            modelBuilder.Entity<hdAssetTypes>().HasData(
+                new hdAssetTypes { TypeID = 1, Name = "Laptop"},
+                new hdAssetTypes { TypeID = 2, Name = "DeskTop" },
+                new hdAssetTypes { TypeID = 3, Name = "Server" }
+                
+            );
         }
 
 

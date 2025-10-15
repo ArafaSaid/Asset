@@ -1,15 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Asset.Models
 {
+    [Index(nameof(ComputerName))] // Index for faster search
+    [Index(nameof(SerialNumber))] // Index for faster search
+    [Index(nameof(StatusId))] // Index for filtering by status
     public class hdAssets
     {
         [Key]
         public int AssetID { get; set; }
+        [MaxLength(200)]
         public required string ComputerName { get; set; }
+        [MaxLength(100)]
         public required string UserName { get; set; }
         public int? TypeID { get; set; }
         public hdAssetTypes? hdAssetTypes { get; set; }
+        [MaxLength(100)]
         public string? SerialNumber { get; set; }
         public string? Model { get; set; }
         public string? Manufacturer { get; set; }
