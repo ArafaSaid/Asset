@@ -100,7 +100,10 @@ namespace Asset.Controllers
             var hdAssets = await _context.Assets
                 .Include(h => h.hdAssetTypes)
                 .Include(h => h.Status)
+                .Include(h => h.History.OrderByDescending(hist => hist.ActionDate).Take(5))
+                    .ThenInclude(hist => hist.ActionType)
                 .FirstOrDefaultAsync(m => m.AssetID == id);
+            
             if (hdAssets == null)
             {
                 return NotFound();

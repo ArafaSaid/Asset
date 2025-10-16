@@ -280,5 +280,34 @@ namespace Asset.Controllers
         {
             return _context.AssetHistories.Any(e => e.HistoryID == id);
         }
+
+        // GET: AssetHistories/AssetHistory/5
+        public async Task<IActionResult> AssetHistory(int assetId)
+        {
+            var asset = await _context.Assets
+                .Include(a => a.hdAssetTypes)
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset == null)
+            {
+                return NotFound();
+            }
+
+            var history = await _context.AssetHistories
+                .Include(h => h.ActionType)
+                .Include(h => h.Asset)
+                .Include(h => h.FromStatus)
+                .Include(h => h.ToStatus)
+                .Where(h => h.AssetID == assetId)
+                .OrderByDescending(h => h.ActionDate)
+                .ThenByDescending(h => h.CreatedAt)
+                .ToListAsync();
+
+            ViewData["Asset"] = asset;
+            ViewData["AssetId"] = assetId;
+            
+            return View(history);
+        }
     }
 }
