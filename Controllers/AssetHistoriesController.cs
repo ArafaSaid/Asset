@@ -32,8 +32,37 @@ namespace Asset.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        // GET: AssetHistories/AssetHistory/5
+        public async Task<IActionResult> AssetHistory(int assetId)
+        {
+            var asset = await _context.Assets
+                .Include(a => a.hdAssetTypes)
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset == null)
+            {
+                return NotFound();
+            }
+
+            var history = await _context.AssetHistories
+                .Include(h => h.ActionType)
+                .Include(h => h.Asset)
+                .Include(h => h.FromStatus)
+                .Include(h => h.ToStatus)
+                .Where(h => h.AssetID == assetId)
+                .OrderByDescending(h => h.ActionDate)
+                .ThenByDescending(h => h.CreatedAt)
+                .ToListAsync();
+
+            ViewData["Asset"] = asset;
+            ViewData["AssetId"] = assetId;
+            
+            return View(history);
+        }
+
         // GET: AssetHistories/Create
-        public IActionResult Create(int? assetId, int? actionTypeId)
+        public async Task<IActionResult> Create(int? assetId, int? actionTypeId)
         {
             ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", actionTypeId);
             ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
@@ -47,8 +76,52 @@ namespace Asset.Controllers
             {
                 ActionDate = DateTime.Now,
                 AssetID = assetId ?? 0,
-                ActionTypeId = actionTypeId ?? 0
+                ActionTypeId = actionTypeId ?? 0,
+                PerformedBy = User.Identity?.Name ?? "System"
             };
+
+            // Pre-populate fields based on action type
+            if (assetId.HasValue && actionTypeId.HasValue)
+            {
+                var asset = await _context.Assets
+                    .Include(a => a.Status)
+                    .FirstOrDefaultAsync(a => a.AssetID == assetId.Value);
+
+                if (asset != null)
+                {
+                    model.FromUser = asset.UserName;
+                    model.FromLocation = asset.Location;
+                    model.FromStatusId = asset.StatusId;
+
+                    // Set description based on action type
+                    switch (actionTypeId.Value)
+                    {
+                        case HistoryActionHelper.USER_CHANGE:
+                            model.Description = "User change initiated";
+                            break;
+                        case HistoryActionHelper.HARDWARE_ADDITION:
+                            model.Description = "Hardware addition/upgrade";
+                            break;
+                        case HistoryActionHelper.RETURN_TO_IT:
+                            model.Description = "Asset returned to IT department";
+                            model.ToUser = "IT Department";
+                            model.ToStatusId = 2; // Inactive
+                            break;
+                        case HistoryActionHelper.RETIRED:
+                            model.Description = "Asset retired from service";
+                            model.ToStatusId = 4; // Retired
+                            break;
+                        case HistoryActionHelper.MAINTENANCE:
+                            model.Description = "Maintenance performed";
+                            model.ToStatusId = 3; // Under Maintenance
+                            break;
+                        case HistoryActionHelper.REPAIR:
+                            model.Description = "Repair work performed";
+                            model.ToStatusId = 3; // Under Maintenance
+                            break;
+                    }
+                }
+            }
             
             return View(model);
         }
@@ -69,6 +142,13 @@ namespace Asset.Controllers
                 await UpdateAssetFromHistory(hdAssetHistory);
                 
                 await _context.SaveChangesAsync();
+                
+                // Redirect back to asset history if assetId is provided
+                if (hdAssetHistory.AssetID > 0)
+                {
+                    return RedirectToAction(nameof(AssetHistory), new { assetId = hdAssetHistory.AssetID });
+                }
+                
                 return RedirectToAction(nameof(Index));
             }
             
@@ -94,9 +174,20 @@ namespace Asset.Controllers
                 case HistoryActionHelper.USER_CHANGE:
                 case HistoryActionHelper.DEPLOYMENT:
                 case HistoryActionHelper.ASSIGNMENT:
+                    if (!string.IsNullOrEmpty(history.ToUser))
+                    {
+                        asset.UserName = history.ToUser;
+                    }
                     if (!string.IsNullOrEmpty(history.AssignedToUser))
                     {
                         asset.UserName = history.AssignedToUser;
+                    }
+                    if (history.ToStatusId.HasValue)
+                    {
+                        asset.StatusId = history.ToStatusId.Value;
+                    }
+                    else
+                    {
                         asset.StatusId = 1; // Active
                     }
                     break;
@@ -123,6 +214,21 @@ namespace Asset.Controllers
                         asset.UpdatedAt = DateTime.UtcNow;
                         asset.UpdatedBy = history.PerformedBy;
                     }
+                    if (history.ToStatusId.HasValue)
+                    {
+                        asset.StatusId = history.ToStatusId.Value;
+                    }
+                    break;
+
+                case HistoryActionHelper.TRANSFER:
+                    if (!string.IsNullOrEmpty(history.ToLocation))
+                    {
+                        asset.Location = history.ToLocation;
+                    }
+                    if (!string.IsNullOrEmpty(history.ToUser))
+                    {
+                        asset.UserName = history.ToUser;
+                    }
                     break;
             }
 
@@ -132,24 +238,240 @@ namespace Asset.Controllers
         }
 
         // Quick action methods for common operations
-        public IActionResult ChangeUser(int assetId)
+        public async Task<IActionResult> ChangeUser(int assetId)
         {
-            return Create(assetId, HistoryActionHelper.USER_CHANGE);
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.USER_CHANGE);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.USER_CHANGE,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "User change initiated";
+            }
+            
+            return View("Create", model);
         }
 
-        public IActionResult AddHardware(int assetId)
+        public async Task<IActionResult> AddHardware(int assetId)
         {
-            return Create(assetId, HistoryActionHelper.HARDWARE_ADDITION);
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.HARDWARE_ADDITION);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.HARDWARE_ADDITION,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "Hardware addition/upgrade";
+            }
+            
+            return View("Create", model);
         }
 
-        public IActionResult ReturnToIT(int assetId)
+        public async Task<IActionResult> ReturnToIT(int assetId)
         {
-            return Create(assetId, HistoryActionHelper.RETURN_TO_IT);
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.RETURN_TO_IT);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.RETURN_TO_IT,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "Asset returned to IT department";
+                model.ToUser = "IT Department";
+                model.ToStatusId = 2; // Inactive
+            }
+            
+            return View("Create", model);
         }
 
-        public IActionResult RetireAsset(int assetId)
+        public async Task<IActionResult> RetireAsset(int assetId)
         {
-            return Create(assetId, HistoryActionHelper.RETIRED);
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.RETIRED);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.RETIRED,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "Asset retired from service";
+                model.ToStatusId = 4; // Retired
+            }
+            
+            return View("Create", model);
+        }
+
+        public async Task<IActionResult> PerformMaintenance(int assetId)
+        {
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.MAINTENANCE);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.MAINTENANCE,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "Maintenance performed";
+                model.ToStatusId = 3; // Under Maintenance
+            }
+            
+            return View("Create", model);
+        }
+
+        public async Task<IActionResult> PerformRepair(int assetId)
+        {
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.REPAIR);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.REPAIR,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "Repair work performed";
+                model.ToStatusId = 3; // Under Maintenance
+            }
+            
+            return View("Create", model);
+        }
+
+        public async Task<IActionResult> TransferAsset(int assetId)
+        {
+            ViewData["ActionTypeId"] = new SelectList(_context.AssetActionTypes, "ActionTypeId", "Name", HistoryActionHelper.TRANSFER);
+            ViewData["AssetID"] = new SelectList(_context.Assets.Select(a => new { 
+                a.AssetID, 
+                DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
+            }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            
+            var model = new hdAssetHistory
+            {
+                ActionDate = DateTime.Now,
+                AssetID = assetId,
+                ActionTypeId = HistoryActionHelper.TRANSFER,
+                PerformedBy = User.Identity?.Name ?? "System"
+            };
+
+            var asset = await _context.Assets
+                .Include(a => a.Status)
+                .FirstOrDefaultAsync(a => a.AssetID == assetId);
+
+            if (asset != null)
+            {
+                model.FromUser = asset.UserName;
+                model.FromLocation = asset.Location;
+                model.FromStatusId = asset.StatusId;
+                model.Description = "Asset transfer";
+            }
+            
+            return View("Create", model);
         }
 
         // GET: AssetHistories/Details/5
@@ -279,35 +601,6 @@ namespace Asset.Controllers
         private bool hdAssetHistoryExists(int id)
         {
             return _context.AssetHistories.Any(e => e.HistoryID == id);
-        }
-
-        // GET: AssetHistories/AssetHistory/5
-        public async Task<IActionResult> AssetHistory(int assetId)
-        {
-            var asset = await _context.Assets
-                .Include(a => a.hdAssetTypes)
-                .Include(a => a.Status)
-                .FirstOrDefaultAsync(a => a.AssetID == assetId);
-
-            if (asset == null)
-            {
-                return NotFound();
-            }
-
-            var history = await _context.AssetHistories
-                .Include(h => h.ActionType)
-                .Include(h => h.Asset)
-                .Include(h => h.FromStatus)
-                .Include(h => h.ToStatus)
-                .Where(h => h.AssetID == assetId)
-                .OrderByDescending(h => h.ActionDate)
-                .ThenByDescending(h => h.CreatedAt)
-                .ToListAsync();
-
-            ViewData["Asset"] = asset;
-            ViewData["AssetId"] = assetId;
-            
-            return View(history);
         }
     }
 }

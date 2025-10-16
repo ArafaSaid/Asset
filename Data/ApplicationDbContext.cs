@@ -63,7 +63,15 @@ namespace Asset.Data
                 new AssetActionType { ActionTypeId = 1, Name = "Maintenance", Description = "Asset maintenance performed" },
                 new AssetActionType { ActionTypeId = 2, Name = "User Change", Description = "Asset assigned to a different user" },
                 new AssetActionType { ActionTypeId = 3, Name = "Spare Part Replacement", Description = "Replaced a part of the asset" },
-                new AssetActionType { ActionTypeId = 4, Name = "Assignment", Description = "New asset assignment" }
+                new AssetActionType { ActionTypeId = 4, Name = "Assignment", Description = "New asset assignment" },
+                new AssetActionType { ActionTypeId = 5, Name = "Hardware Addition", Description = "Hardware component added to asset" },
+                new AssetActionType { ActionTypeId = 6, Name = "Hardware Removal", Description = "Hardware component removed from asset" },
+                new AssetActionType { ActionTypeId = 7, Name = "Return to IT", Description = "Asset returned to IT department" },
+                new AssetActionType { ActionTypeId = 8, Name = "Retired", Description = "Asset permanently retired from service" },
+                new AssetActionType { ActionTypeId = 9, Name = "Transfer", Description = "Asset transferred to different location" },
+                new AssetActionType { ActionTypeId = 10, Name = "Repair", Description = "Asset repair work performed" },
+                new AssetActionType { ActionTypeId = 11, Name = "Upgrade", Description = "Asset upgraded with new components" },
+                new AssetActionType { ActionTypeId = 12, Name = "Deployment", Description = "Asset deployed to user" }
             );
 
             modelBuilder.Entity<hdAssetTypes>().HasData(
