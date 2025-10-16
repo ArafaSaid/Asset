@@ -30,29 +30,143 @@
                     <dl class="row mb-0">
                         <dt class="col-sm-4 text-muted">Asset</dt>
                         <dd class="col-sm-8 fw-semibold">
-                            <span class="badge bg-primary">@Model.Asset?.AssetID</span>
+                            <span class="badge bg-primary">#@Model.Asset?.AssetID</span>
+                            <span class="ms-2">@Model.Asset?.ComputerName</span>
                         </dd>
                         <dt class="col-sm-4 text-muted">Action Type</dt>
                         <dd class="col-sm-8">
-                            <span class="badge bg-info">@Model.ActionType?.ActionTypeId</span>
+                            <span class="badge bg-info">@Model.ActionType?.Name</span>
                         </dd>
                         <dt class="col-sm-4 text-muted">Description</dt>
                         <dd class="col-sm-8">@Model.Description</dd>
-                        <dt class="col-sm-4 text-muted">Spare Part</dt>
-                        <dd class="col-sm-8">@Model.SparePart</dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.ReturnReason))
+                        {
+                            <dt class="col-sm-4 text-muted">Return Reason</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-warning text-dark">@Model.ReturnReason</span>
+                            </dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.SparePart))
+                        {
+                            <dt class="col-sm-4 text-muted">Spare Part</dt>
+                            <dd class="col-sm-8">@Model.SparePart</dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.SparePartSerialNumber))
+                        {
+                            <dt class="col-sm-4 text-muted">Part Serial</dt>
+                            <dd class="col-sm-8">@Model.SparePartSerialNumber</dd>
+                        }
+                        
                         <dt class="col-sm-4 text-muted">Performed By</dt>
                         <dd class="col-sm-8">
                             <span class="badge bg-success">@Model.PerformedBy</span>
                         </dd>
-                        <dt class="col-sm-4 text-muted">Assigned User</dt>
-                        <dd class="col-sm-8">@Model.AssignedToUser</dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.AssignedToUser))
+                        {
+                            <dt class="col-sm-4 text-muted">Assigned User</dt>
+                            <dd class="col-sm-8">@Model.AssignedToUser</dd>
+                        }
+                        
                         <dt class="col-sm-4 text-muted">Action Date</dt>
                         <dd class="col-sm-8">
                             <span class="badge bg-light text-dark">@Model.ActionDate.ToString("MMM dd, yyyy")</span>
                         </dd>
+                        
+                        @if (Model.Cost.HasValue)
+                        {
+                            <dt class="col-sm-4 text-muted">Cost</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-success">@Model.Cost.Value.ToString("C")</span>
+                            </dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+                        {
+                            <dt class="col-sm-4 text-muted">Attachment</dt>
+                            <dd class="col-sm-8">
+                                <a href="@Model.AttachmentPath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-download"></i> Download
+                                </a>
+                            </dd>
+                        }
                     </dl>
                 </div>
             </div>
+
+            @if (!string.IsNullOrEmpty(Model.FromUser) || !string.IsNullOrEmpty(Model.ToUser) || 
+                 !string.IsNullOrEmpty(Model.FromLocation) || !string.IsNullOrEmpty(Model.ToLocation) ||
+                 Model.FromStatusId.HasValue || Model.ToStatusId.HasValue)
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Changes Tracked</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            @if (!string.IsNullOrEmpty(Model.FromUser) || !string.IsNullOrEmpty(Model.ToUser))
+                            {
+                                <dt class="col-sm-4 text-muted">User</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.FromUser))
+                                    {
+                                        <span class="badge bg-danger">@Model.FromUser</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.FromUser) && !string.IsNullOrEmpty(Model.ToUser))
+                                    {
+                                        <i class="bi bi-arrow-right mx-2"></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.ToUser))
+                                    {
+                                        <span class="badge bg-success">@Model.ToUser</span>
+                                    }
+                                </dd>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.FromLocation) || !string.IsNullOrEmpty(Model.ToLocation))
+                            {
+                                <dt class="col-sm-4 text-muted">Location</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.FromLocation))
+                                    {
+                                        <span class="badge bg-danger">@Model.FromLocation</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.FromLocation) && !string.IsNullOrEmpty(Model.ToLocation))
+                                    {
+                                        <i class="bi bi-arrow-right mx-2"></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.ToLocation))
+                                    {
+                                        <span class="badge bg-success">@Model.ToLocation</span>
+                                    }
+                                </dd>
+                            }
+                            
+                            @if (Model.FromStatusId.HasValue || Model.ToStatusId.HasValue)
+                            {
+                                <dt class="col-sm-4 text-muted">Status</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.FromStatusId.HasValue)
+                                    {
+                                        <span class="badge bg-danger">@Model.FromStatus?.Name</span>
+                                    }
+                                    @if (Model.FromStatusId.HasValue && Model.ToStatusId.HasValue)
+                                    {
+                                        <i class="bi bi-arrow-right mx-2"></i>
+                                    }
+                                    @if (Model.ToStatusId.HasValue)
+                                    {
+                                        <span class="badge bg-success">@Model.ToStatus?.Name</span>
+                                    }
+                                </dd>
+                            }
+                        </dl>
+                    </div>
+                </div>
+            }
         </div>
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm mb-4">

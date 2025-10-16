@@ -25,6 +25,8 @@ namespace Asset.Controllers
             var applicationDbContext = _context.AssetHistories
                 .Include(h => h.ActionType)
                 .Include(h => h.Asset)
+                .Include(h => h.FromStatus)
+                .Include(h => h.ToStatus)
                 .OrderByDescending(h => h.ActionDate)
                 .ThenByDescending(h => h.CreatedAt);
             return View(await applicationDbContext.ToListAsync());
@@ -38,6 +40,8 @@ namespace Asset.Controllers
                 a.AssetID, 
                 DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
             }), "AssetID", "DisplayText", assetId);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name");
             
             var model = new hdAssetHistory
             {
@@ -52,7 +56,7 @@ namespace Asset.Controllers
         // POST: AssetHistories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("HistoryID,AssetID,ActionTypeId,Description,SparePart,PerformedBy,AssignedToUser,ActionDate,CreatedBy")] hdAssetHistory hdAssetHistory)
+        public async Task<IActionResult> Create([Bind("HistoryID,AssetID,ActionTypeId,Description,FromUser,ToUser,FromLocation,ToLocation,FromStatusId,ToStatusId,SparePart,SparePartSerialNumber,PerformedBy,AssignedToUser,Cost,ReturnReason,AttachmentPath,ActionDate")] hdAssetHistory hdAssetHistory)
         {
             if (ModelState.IsValid)
             {
@@ -73,6 +77,8 @@ namespace Asset.Controllers
                 a.AssetID, 
                 DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
             }), "AssetID", "DisplayText", hdAssetHistory.AssetID);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name", hdAssetHistory.FromStatusId);
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name", hdAssetHistory.ToStatusId);
             
             return View(hdAssetHistory);
         }
@@ -157,6 +163,8 @@ namespace Asset.Controllers
             var hdAssetHistory = await _context.AssetHistories
                 .Include(h => h.ActionType)
                 .Include(h => h.Asset)
+                .Include(h => h.FromStatus)
+                .Include(h => h.ToStatus)
                 .FirstOrDefaultAsync(m => m.HistoryID == id);
             if (hdAssetHistory == null)
             {
@@ -184,13 +192,15 @@ namespace Asset.Controllers
                 a.AssetID, 
                 DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
             }), "AssetID", "DisplayText", hdAssetHistory.AssetID);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name", hdAssetHistory.FromStatusId);
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name", hdAssetHistory.ToStatusId);
             return View(hdAssetHistory);
         }
 
         // POST: AssetHistories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("HistoryID,AssetID,ActionTypeId,Description,SparePart,PerformedBy,AssignedToUser,ActionDate,CreatedAt,CreatedBy,UpdatedBy")] hdAssetHistory hdAssetHistory)
+        public async Task<IActionResult> Edit(int id, [Bind("HistoryID,AssetID,ActionTypeId,Description,FromUser,ToUser,FromLocation,ToLocation,FromStatusId,ToStatusId,SparePart,SparePartSerialNumber,PerformedBy,AssignedToUser,Cost,ReturnReason,AttachmentPath,ActionDate,CreatedAt,CreatedBy")] hdAssetHistory hdAssetHistory)
         {
             if (id != hdAssetHistory.HistoryID)
             {
@@ -224,6 +234,8 @@ namespace Asset.Controllers
                 a.AssetID, 
                 DisplayText = $"{a.AssetID} - {a.ComputerName} ({a.UserName})" 
             }), "AssetID", "DisplayText", hdAssetHistory.AssetID);
+            ViewData["FromStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name", hdAssetHistory.FromStatusId);
+            ViewData["ToStatusId"] = new SelectList(_context.AssetStatuses, "StatusId", "Name", hdAssetHistory.ToStatusId);
             return View(hdAssetHistory);
         }
 
@@ -238,6 +250,8 @@ namespace Asset.Controllers
             var hdAssetHistory = await _context.AssetHistories
                 .Include(h => h.ActionType)
                 .Include(h => h.Asset)
+                .Include(h => h.FromStatus)
+                .Include(h => h.ToStatus)
                 .FirstOrDefaultAsync(m => m.HistoryID == id);
             if (hdAssetHistory == null)
             {

@@ -28,7 +28,9 @@
                             <th>Asset</th>
                             <th>Action Type</th>
                             <th>Description</th>
+                            <th>Changes</th>
                             <th>Details</th>
+                            <th>Cost</th>
                             <th>Performed By</th>
                             <th>Action Date</th>
                             <th class="text-center">Actions</th>
@@ -67,15 +69,101 @@
                                 </td>
                                 <td>
                                     <small>@item.Description</small>
+                                    @if (!string.IsNullOrEmpty(item.ReturnReason))
+                                    {
+                                        <div class="mt-1">
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-exclamation-triangle me-1"></i>@item.ReturnReason
+                                            </span>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.FromUser) || !string.IsNullOrEmpty(item.ToUser))
+                                    {
+                                        <div class="small">
+                                            <i class="bi bi-person text-muted"></i>
+                                            @if (!string.IsNullOrEmpty(item.FromUser))
+                                            {
+                                                <span class="text-danger">@item.FromUser</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.FromUser) && !string.IsNullOrEmpty(item.ToUser))
+                                            {
+                                                <i class="bi bi-arrow-right mx-1"></i>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.ToUser))
+                                            {
+                                                <span class="text-success">@item.ToUser</span>
+                                            }
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.FromLocation) || !string.IsNullOrEmpty(item.ToLocation))
+                                    {
+                                        <div class="small">
+                                            <i class="bi bi-geo-alt text-muted"></i>
+                                            @if (!string.IsNullOrEmpty(item.FromLocation))
+                                            {
+                                                <span class="text-danger">@item.FromLocation</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.FromLocation) && !string.IsNullOrEmpty(item.ToLocation))
+                                            {
+                                                <i class="bi bi-arrow-right mx-1"></i>
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.ToLocation))
+                                            {
+                                                <span class="text-success">@item.ToLocation</span>
+                                            }
+                                        </div>
+                                    }
+                                    @if (item.FromStatusId.HasValue || item.ToStatusId.HasValue)
+                                    {
+                                        <div class="small">
+                                            <i class="bi bi-flag text-muted"></i>
+                                            @if (item.FromStatusId.HasValue)
+                                            {
+                                                <span class="badge bg-danger">@item.FromStatus?.Name</span>
+                                            }
+                                            @if (item.FromStatusId.HasValue && item.ToStatusId.HasValue)
+                                            {
+                                                <i class="bi bi-arrow-right mx-1"></i>
+                                            }
+                                            @if (item.ToStatusId.HasValue)
+                                            {
+                                                <span class="badge bg-success">@item.ToStatus?.Name</span>
+                                            }
+                                        </div>
+                                    }
                                 </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(item.SparePart))
                                     {
                                         <div><i class="bi bi-wrench text-muted"></i> <small>@item.SparePart</small></div>
                                     }
+                                    @if (!string.IsNullOrEmpty(item.SparePartSerialNumber))
+                                    {
+                                        <div><i class="bi bi-hash text-muted"></i> <small>@item.SparePartSerialNumber</small></div>
+                                    }
                                     @if (!string.IsNullOrEmpty(item.AssignedToUser))
                                     {
-                                        <div><i class="bi bi-person text-muted"></i> <small>@item.AssignedToUser</small></div>
+                                        <div><i class="bi bi-person-check text-muted"></i> <small>@item.AssignedToUser</small></div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.AttachmentPath))
+                                    {
+                                        <div>
+                                            <a href="@item.AttachmentPath" target="_blank" class="text-primary small">
+                                                <i class="bi bi-paperclip"></i> Attachment
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.Cost.HasValue && item.Cost.Value > 0)
+                                    {
+                                        <span class="badge bg-success">@item.Cost.Value.ToString("C")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
                                     }
                                 </td>
                                 <td>
@@ -130,6 +218,9 @@
         .badge {
             font-size: 0.75rem;
             font-weight: 500;
+        }
+        .bi-arrow-right {
+            font-size: 0.7rem;
         }
     </style>
 }

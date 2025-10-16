@@ -31,7 +31,6 @@
                         </h4>
                         <p class="mb-0">
                             You are about to permanently delete this asset history record. This action <strong>cannot be undone</strong>.
-                            Please review the information below carefully before proceeding.
                         </p>
                     </div>
                 </div>
@@ -43,7 +42,7 @@
     <div class="card border-danger shadow-sm mb-4">
         <div class="card-header bg-danger text-white">
             <h5 class="mb-0">
-                <i class="bi bi-clock-history me-2"></i>History to be Deleted: <strong>#@Model.HistoryID</strong>
+                <i class="bi bi-clock-history me-2"></i>History #@Model.HistoryID
             </h5>
         </div>
         <div class="card-body">
@@ -51,8 +50,9 @@
                 <div class="col-md-6">
                     <dl class="row">
                         <dt class="col-sm-5 text-muted">Asset</dt>
-                        <dd class="col-sm-7 fw-bold text-danger">
+                        <dd class="col-sm-7">
                             <span class="badge bg-primary">@Model.Asset?.AssetID</span>
+                            @Model.Asset?.ComputerName
                         </dd>
                         <dt class="col-sm-5 text-muted">Action Type</dt>
                         <dd class="col-sm-7">
@@ -60,91 +60,134 @@
                         </dd>
                         <dt class="col-sm-5 text-muted">Description</dt>
                         <dd class="col-sm-7">@Model.Description</dd>
-                        <dt class="col-sm-5 text-muted">Spare Part</dt>
-                        <dd class="col-sm-7">@Model.SparePart</dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.SparePart))
+                        {
+                            <dt class="col-sm-5 text-muted">Spare Part</dt>
+                            <dd class="col-sm-7">@Model.SparePart</dd>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.SparePartSerialNumber))
+                        {
+                            <dt class="col-sm-5 text-muted">Part Serial</dt>
+                            <dd class="col-sm-7">@Model.SparePartSerialNumber</dd>
+                        }
+                        
                         <dt class="col-sm-5 text-muted">Performed By</dt>
                         <dd class="col-sm-7">
                             <span class="badge bg-success">@Model.PerformedBy</span>
                         </dd>
-                        <dt class="col-sm-5 text-muted">Assigned User</dt>
-                        <dd class="col-sm-7">@Model.AssignedToUser</dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.AssignedToUser))
+                        {
+                            <dt class="col-sm-5 text-muted">Assigned User</dt>
+                            <dd class="col-sm-7">@Model.AssignedToUser</dd>
+                        }
+                        
                         <dt class="col-sm-5 text-muted">Action Date</dt>
                         <dd class="col-sm-7">
                             <span class="badge bg-light text-dark">@Model.ActionDate.ToString("MMM dd, yyyy")</span>
                         </dd>
+                        
+                        @if (Model.Cost.HasValue)
+                        {
+                            <dt class="col-sm-5 text-muted">Cost</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-success">@Model.Cost.Value.ToString("C")</span>
+                            </dd>
+                        }
                     </dl>
                 </div>
                 <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-5 text-muted">Created At</dt>
-                        <dd class="col-sm-7">@Model.CreatedAt.ToString("MMM dd, yyyy 'at' hh:mm tt")</dd>
-                        <dt class="col-sm-5 text-muted">Created By</dt>
-                        <dd class="col-sm-7">@Model.CreatedBy</dd>
-                        <dt class="col-sm-5 text-muted">Updated At</dt>
+                    @if (!string.IsNullOrEmpty(Model.FromUser) || !string.IsNullOrEmpty(Model.ToUser) || 
+                         !string.IsNullOrEmpty(Model.FromLocation) || !string.IsNullOrEmpty(Model.ToLocation))
+                    {
+                        <h6 class="text-muted mb-3">Changes</h6>
+                        <dl class="row">
+                            @if (!string.IsNullOrEmpty(Model.FromUser) || !string.IsNullOrEmpty(Model.ToUser))
+                            {
+                                <dt class="col-sm-5 text-muted">User</dt>
+                                <dd class="col-sm-7">
+                                    @if (!string.IsNullOrEmpty(Model.FromUser))
+                                    {
+                                        <span class="badge bg-danger small">@Model.FromUser</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.FromUser) && !string.IsNullOrEmpty(Model.ToUser))
+                                    {
+                                        <i class="bi bi-arrow-right mx-1"></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.ToUser))
+                                    {
+                                        <span class="badge bg-success small">@Model.ToUser</span>
+                                    }
+                                </dd>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.FromLocation) || !string.IsNullOrEmpty(Model.ToLocation))
+                            {
+                                <dt class="col-sm-5 text-muted">Location</dt>
+                                <dd class="col-sm-7">
+                                    @if (!string.IsNullOrEmpty(Model.FromLocation))
+                                    {
+                                        <span class="badge bg-danger small">@Model.FromLocation</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.FromLocation) && !string.IsNullOrEmpty(Model.ToLocation))
+                                    {
+                                        <i class="bi bi-arrow-right mx-1"></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.ToLocation))
+                                    {
+                                        <span class="badge bg-success small">@Model.ToLocation</span>
+                                    }
+                                </dd>
+                            }
+                            
+                            @if (Model.FromStatusId.HasValue || Model.ToStatusId.HasValue)
+                            {
+                                <dt class="col-sm-5 text-muted">Status</dt>
+                                <dd class="col-sm-7">
+                                    @if (Model.FromStatusId.HasValue)
+                                    {
+                                        <span class="badge bg-danger small">@Model.FromStatus?.Name</span>
+                                    }
+                                    @if (Model.FromStatusId.HasValue && Model.ToStatusId.HasValue)
+                                    {
+                                        <i class="bi bi-arrow-right mx-1"></i>
+                                    }
+                                    @if (Model.ToStatusId.HasValue)
+                                    {
+                                        <span class="badge bg-success small">@Model.ToStatus?.Name</span>
+                                    }
+                                </dd>
+                            }
+                        </dl>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.ReturnReason))
+                    {
+                        <h6 class="text-muted mb-2 mt-3">Return Reason</h6>
+                        <p class="text-danger">@Model.ReturnReason</p>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+                    {
+                        <h6 class="text-muted mb-2 mt-3">Attachment</h6>
+                        <p><small>@Model.AttachmentPath</small></p>
+                    }
+                    
+                    <h6 class="text-muted mb-2 mt-3">Audit</h6>
+                    <dl class="row small">
+                        <dt class="col-sm-5">Created</dt>
+                        <dd class="col-sm-7">@Model.CreatedAt.ToString("MMM dd, yyyy") by @Model.CreatedBy</dd>
+                        <dt class="col-sm-5">Updated</dt>
                         <dd class="col-sm-7">
-                            @(Model.UpdatedAt?.ToString("MMM dd, yyyy 'at' hh:mm tt") ?? "Never")
+                            @(Model.UpdatedAt?.ToString("MMM dd, yyyy") ?? "Never")
+                            @if (!string.IsNullOrEmpty(Model.UpdatedBy))
+                            {
+                                <text> by @Model.UpdatedBy</text>
+                            }
                         </dd>
-                        <dt class="col-sm-5 text-muted">Updated By</dt>
-                        <dd class="col-sm-7">@Model.UpdatedBy</dd>
                     </dl>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Left Column - Impact Warning -->
-        <div class="col-lg-6">
-            <div class="card border-warning shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>What will be deleted?</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="mb-0">
-                        <li>This history record and all its details</li>
-                        <li>Audit trail and timestamps</li>
-                        <li>Reference to asset <strong>@Model.Asset?.AssetID</strong></li>
-                        <li>Action performed by <strong>@Model.PerformedBy</strong></li>
-                    </ul>
-                    <div class="alert alert-warning mt-3 mb-0">
-                        <small>
-                            <i class="bi bi-info-circle me-1"></i>
-                            <strong>Note:</strong> Consider archiving instead of deleting if you need to maintain historical records.
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column - Confirmation Checklist -->
-        <div class="col-lg-6">
-            <div class="card border-danger shadow-sm mb-4">
-                <div class="card-header bg-danger text-white">
-                    <h6 class="mb-0"><i class="bi bi-check2-square me-2"></i>Deletion Checklist</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="confirm1">
-                        <label class="form-check-label small" for="confirm1">
-                            I have verified the history information above
-                        </label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="confirm2">
-                        <label class="form-check-label small" for="confirm2">
-                            I understand this action cannot be undone
-                        </label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="confirm3">
-                        <label class="form-check-label small" for="confirm3">
-                            I have authorization to delete this history record
-                        </label>
-                    </div>
-                    <div class="alert alert-danger mb-0 small">
-                        <i class="bi bi-shield-x me-1"></i>
-                        All checkboxes must be selected to enable deletion.
-                    </div>
                 </div>
             </div>
         </div>
@@ -155,12 +198,12 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <form asp-action="Delete" id="deleteForm">
+                    <form asp-action="Delete">
                         <input type="hidden" asp-for="HistoryID" />
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <a asp-action="Details" asp-route-id="@Model.HistoryID" class="btn btn-outline-info">
-                                    <i class="bi bi-eye me-2"></i>View Full Details
+                                    <i class="bi bi-eye me-2"></i>View Details
                                 </a>
                                 <a asp-action="Edit" asp-route-id="@Model.HistoryID" class="btn btn-outline-primary">
                                     <i class="bi bi-pencil me-2"></i>Edit Instead
@@ -168,10 +211,11 @@
                             </div>
                             <div>
                                 <a asp-action="Index" class="btn btn-outline-secondary btn-lg me-2">
-                                    <i class="bi bi-arrow-left me-2"></i>Cancel & Go Back
+                                    <i class="bi bi-arrow-left me-2"></i>Cancel
                                 </a>
-                                <button type="submit" class="btn btn-danger btn-lg" id="deleteButton" disabled>
-                                    <i class="bi bi-trash me-2"></i>Permanently Delete History
+                                <button type="submit" class="btn btn-danger btn-lg"
+                                        onclick="return confirm('Are you sure you want to delete this history record? This cannot be undone!')">
+                                    <i class="bi bi-trash me-2"></i>Delete
                                 </button>
                             </div>
                         </div>
@@ -184,68 +228,7 @@
 
 @section Scripts {
     <style>
-        .card {
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-        }
-        #deleteButton:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        .form-check-input:checked {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
+        .card { transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
     </style>
-    <script>
-        // Enable delete button only when all checkboxes are checked
-        const checkboxes = document.querySelectorAll('.form-check-input');
-        const deleteButton = document.getElementById('deleteButton');
-        const deleteForm = document.getElementById('deleteForm');
-
-        function updateDeleteButton() {
-            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-            deleteButton.disabled = !allChecked;
-        }
-
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', updateDeleteButton);
-        });
-
-        // Final confirmation on submit
-        deleteForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const historyId = '@Model.HistoryID';
-            const confirmation = confirm(
-                `⚠️ FINAL WARNING ⚠️\n\n` +
-                `You are about to permanently delete:\n` +
-                `History Record: #${historyId}\n` +
-                `Asset: @Model.Asset?.AssetID\n\n` +
-                `This action CANNOT be undone!\n\n` +
-                `Type the history ID to confirm deletion.`
-            );
-            if (confirmation) {
-                const userInput = prompt(`Please type "${historyId}" to confirm:`);
-                if (userInput === historyId) {
-                    deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
-                    deleteButton.disabled = true;
-                    this.submit();
-                } else {
-                    alert('History ID did not match. Deletion cancelled.');
-                }
-            }
-        });
-
-        // Warn if user tries to leave page
-        window.addEventListener('beforeunload', function(e) {
-            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-            if (anyChecked) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        });
-    </script>
 }
