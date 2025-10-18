@@ -23,28 +23,41 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house"></i> Home
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Assets" asp-action="Dashboard">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Assets" asp-action="Index">Assets</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Assets" asp-action="Index">
+                                <i class="bi bi-laptop"></i> Hardware Assets
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="assetTypes" asp-action="Index">Types</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Software" asp-action="Index">
+                                <i class="bi bi-file-code"></i> Software
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="assetActionTypes" asp-action="Index">ActionTypes</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Consumables" asp-action="Index">
+                                <i class="bi bi-box-seam"></i> Consumables
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="assetstatus" asp-action="Index">Status</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AssetHistories" asp-action="Index">AssetHistories</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Assets" asp-action="Dashboard">Dashboard</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-gear"></i> Settings
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="assetTypes" asp-action="Index">Asset Types</a></li>
+                                <li><a class="dropdown-item" asp-controller="assetstatus" asp-action="Index">Asset Status</a></li>
+                                <li><a class="dropdown-item" asp-controller="assetActionTypes" asp-action="Index">Action Types</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="AssetHistories" asp-action="Index">Asset History</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

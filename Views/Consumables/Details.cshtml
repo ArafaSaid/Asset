@@ -1,0 +1,114 @@
+@model Asset.Models.Consumable
+
+@{
+    ViewData["Title"] = "Consumable Details";
+    var isLowStock = Model.QuantityInStock <= Model.MinimumStockLevel;
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            @if (isLowStock)
+            {
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> <strong>Low Stock Alert!</strong> 
+                    This item needs to be reordered.
+                </div>
+            }
+
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5>@Model.Name</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Category</dt>
+                        <dd class="col-sm-8">@Model.Category</dd>
+
+                        <dt class="col-sm-4">Part Number</dt>
+                        <dd class="col-sm-8">@Model.PartNumber</dd>
+
+                        <dt class="col-sm-4">Manufacturer</dt>
+                        <dd class="col-sm-8">@Model.Manufacturer</dd>
+
+                        <dt class="col-sm-4">Supplier</dt>
+                        <dd class="col-sm-8">@Model.Supplier</dd>
+
+                        <dt class="col-sm-4">Unit Price</dt>
+                        <dd class="col-sm-8">@(Model.UnitPrice?.ToString("C") ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Quantity in Stock</dt>
+                        <dd class="col-sm-8">
+                            <span class="@(isLowStock ? "text-danger fw-bold" : "text-success")">
+                                @Model.QuantityInStock @Model.UnitOfMeasure
+                                @if (isLowStock)
+                                {
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                }
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4">Minimum Stock Level</dt>
+                        <dd class="col-sm-8">@Model.MinimumStockLevel @Model.UnitOfMeasure</dd>
+
+                        <dt class="col-sm-4">Reorder Quantity</dt>
+                        <dd class="col-sm-8">@Model.ReorderQuantity @Model.UnitOfMeasure</dd>
+
+                        <dt class="col-sm-4">Unit of Measure</dt>
+                        <dd class="col-sm-8">@Model.UnitOfMeasure</dd>
+
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@Model.Location</dd>
+
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8">@Model.Description</dd>
+
+                        <dt class="col-sm-4">Last Ordered Date</dt>
+                        <dd class="col-sm-8">@(Model.LastOrderedDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Last Received Date</dt>
+                        <dd class="col-sm-8">@(Model.LastReceivedDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Notes</dt>
+                        <dd class="col-sm-8">@Model.Notes</dd>
+
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Created At</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("MM/dd/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4">Created By</dt>
+                        <dd class="col-sm-8">@Model.CreatedBy</dd>
+
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <dt class="col-sm-4">Updated At</dt>
+                            <dd class="col-sm-8">@Model.UpdatedAt.Value.ToString("MM/dd/yyyy HH:mm")</dd>
+
+                            <dt class="col-sm-4">Updated By</dt>
+                            <dd class="col-sm-8">@Model.UpdatedBy</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <a asp-action="Edit" asp-route-id="@Model.ConsumableId" class="btn btn-warning">Edit</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,119 @@
+@model Asset.Models.Software
+
+@{
+    ViewData["Title"] = "Software Details";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5>@Model.Name</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Version</dt>
+                        <dd class="col-sm-8">@Model.Version</dd>
+
+                        <dt class="col-sm-4">Vendor</dt>
+                        <dd class="col-sm-8">@Model.Vendor</dd>
+
+                        <dt class="col-sm-4">Category</dt>
+                        <dd class="col-sm-8">@Model.Category</dd>
+
+                        <dt class="col-sm-4">License Type</dt>
+                        <dd class="col-sm-8"><span class="badge bg-info">@Model.LicenseType</span></dd>
+
+                        <dt class="col-sm-4">License Key</dt>
+                        <dd class="col-sm-8">@Model.LicenseKey</dd>
+
+                        <dt class="col-sm-4">Number of Licenses</dt>
+                        <dd class="col-sm-8">@Model.NumberOfLicenses</dd>
+
+                        <dt class="col-sm-4">Licenses In Use</dt>
+                        <dd class="col-sm-8">
+                            @Model.LicensesInUse
+                            <span class="badge bg-secondary">@(Model.NumberOfLicenses - Model.LicensesInUse) available</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Purchase Date</dt>
+                        <dd class="col-sm-8">@(Model.PurchaseDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Purchase Price</dt>
+                        <dd class="col-sm-8">@(Model.PurchasePrice?.ToString("C") ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Expiration Date</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.ExpirationDate.HasValue)
+                            {
+                                var isExpiring = Model.ExpirationDate.Value <= DateTime.Now.AddDays(30);
+                                <span class="@(isExpiring ? "text-danger fw-bold" : "")">
+                                    @Model.ExpirationDate.Value.ToString("MM/dd/yyyy")
+                                    @if (isExpiring)
+                                    {
+                                        <i class="bi bi-exclamation-triangle"></i> <small>Expiring Soon!</small>
+                                    }
+                                </span>
+                            }
+                            else
+                            {
+                                <span>N/A</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Renewal Date</dt>
+                        <dd class="col-sm-8">@(Model.RenewalDate?.ToString("MM/dd/yyyy") ?? "N/A")</dd>
+
+                        <dt class="col-sm-4">Supplier</dt>
+                        <dd class="col-sm-8">@Model.Supplier</dd>
+
+                        <dt class="col-sm-4">Support Contact</dt>
+                        <dd class="col-sm-8">@Model.SupportContact</dd>
+
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8">@Model.Description</dd>
+
+                        <dt class="col-sm-4">Notes</dt>
+                        <dd class="col-sm-8">@Model.Notes</dd>
+
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Created At</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("MM/dd/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4">Created By</dt>
+                        <dd class="col-sm-8">@Model.CreatedBy</dd>
+
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <dt class="col-sm-4">Updated At</dt>
+                            <dd class="col-sm-8">@Model.UpdatedAt.Value.ToString("MM/dd/yyyy HH:mm")</dd>
+
+                            <dt class="col-sm-4">Updated By</dt>
+                            <dd class="col-sm-8">@Model.UpdatedBy</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <a asp-action="Edit" asp-route-id="@Model.SoftwareId" class="btn btn-warning">Edit</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
