@@ -16,6 +16,8 @@ namespace Asset.Data
         public DbSet<hdAssetTypes> AssetTypes { get; set; }
         public DbSet<AssetStatus> AssetStatuses { get; set; }
         public DbSet<AssetActionType> AssetActionTypes { get; set; }
+        public DbSet<Software> Software { get; set; }
+        public DbSet<Consumable> Consumables { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -79,6 +81,97 @@ namespace Asset.Data
                 new hdAssetTypes { TypeID = 2, Name = "DeskTop" },
                 new hdAssetTypes { TypeID = 3, Name = "Server" }
                 
+            );
+
+            // Seed data for Software (sample records)
+            modelBuilder.Entity<Software>().HasData(
+                new Software 
+                { 
+                    SoftwareId = 1, 
+                    Name = "Microsoft Office 365",
+                    Version = "2024",
+                    Vendor = "Microsoft",
+                    LicenseType = "Subscription",
+                    NumberOfLicenses = 100,
+                    LicensesInUse = 75,
+                    Category = "Office Suite",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Software 
+                { 
+                    SoftwareId = 2, 
+                    Name = "Windows 11 Pro",
+                    Version = "23H2",
+                    Vendor = "Microsoft",
+                    LicenseType = "Volume",
+                    NumberOfLicenses = 200,
+                    LicensesInUse = 150,
+                    Category = "Operating System",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Software 
+                { 
+                    SoftwareId = 3, 
+                    Name = "Adobe Creative Cloud",
+                    Version = "2024",
+                    Vendor = "Adobe",
+                    LicenseType = "Subscription",
+                    NumberOfLicenses = 20,
+                    LicensesInUse = 18,
+                    Category = "Design Software",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                }
+            );
+
+            // Seed data for Consumables (sample records)
+            modelBuilder.Entity<Consumable>().HasData(
+                new Consumable 
+                { 
+                    ConsumableId = 1, 
+                    Name = "HP LaserJet Toner Cartridge",
+                    Category = "Printer Supplies",
+                    PartNumber = "CF410A",
+                    Manufacturer = "HP",
+                    QuantityInStock = 15,
+                    MinimumStockLevel = 5,
+                    ReorderQuantity = 10,
+                    UnitOfMeasure = "Each",
+                    UnitPrice = 89.99m,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Consumable 
+                { 
+                    ConsumableId = 2, 
+                    Name = "USB-C to HDMI Cable",
+                    Category = "Cables",
+                    PartNumber = "USB-C-HDMI-6FT",
+                    QuantityInStock = 25,
+                    MinimumStockLevel = 10,
+                    ReorderQuantity = 20,
+                    UnitOfMeasure = "Each",
+                    UnitPrice = 12.99m,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Consumable 
+                { 
+                    ConsumableId = 3, 
+                    Name = "Wireless Mouse",
+                    Category = "Peripherals",
+                    PartNumber = "MX-MASTER-3",
+                    Manufacturer = "Logitech",
+                    QuantityInStock = 8,
+                    MinimumStockLevel = 15,
+                    ReorderQuantity = 20,
+                    UnitOfMeasure = "Each",
+                    UnitPrice = 59.99m,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                }
             );
         }
 

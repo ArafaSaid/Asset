@@ -1,8 +1,142 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "IT Asset Management System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+    <div class="text-center mb-5">
+        <h1 class="display-3">
+            <i class="bi bi-building text-primary"></i> IT Asset Management System
+        </h1>
+        <p class="lead">Manage your Hardware, Software, and Consumables Inventory</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Hardware Assets Card -->
+        <div class="col-md-4">
+            <div class="card border-primary shadow h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-laptop display-1 text-primary"></i>
+                    <h3 class="card-title mt-3">Hardware Assets</h3>
+                    <p class="card-text">Track laptops, desktops, servers, and other hardware equipment.</p>
+                    <ul class="list-unstyled text-start">
+                        <li><i class="bi bi-check-circle text-success"></i> Asset tracking</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Warranty management</li>
+                        <li><i class="bi bi-check-circle text-success"></i> User assignments</li>
+                        <li><i class="bi bi-check-circle text-success"></i> History tracking</li>
+                    </ul>
+                    <a asp-controller="Assets" asp-action="Index" class="btn btn-primary btn-lg mt-3">
+                        <i class="bi bi-arrow-right-circle"></i> Manage Hardware
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Software Licenses Card -->
+        <div class="col-md-4">
+            <div class="card border-success shadow h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-code display-1 text-success"></i>
+                    <h3 class="card-title mt-3">Software Licenses</h3>
+                    <p class="card-text">Manage software licenses, subscriptions, and renewals.</p>
+                    <ul class="list-unstyled text-start">
+                        <li><i class="bi bi-check-circle text-success"></i> License tracking</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Expiration alerts</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Usage monitoring</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Vendor management</li>
+                    </ul>
+                    <a asp-controller="Software" asp-action="Index" class="btn btn-success btn-lg mt-3">
+                        <i class="bi bi-arrow-right-circle"></i> Manage Software
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consumables Card -->
+        <div class="col-md-4">
+            <div class="card border-warning shadow h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-box-seam display-1 text-warning"></i>
+                    <h3 class="card-title mt-3">Consumables</h3>
+                    <p class="card-text">Track consumable items and inventory levels.</p>
+                    <ul class="list-unstyled text-start">
+                        <li><i class="bi bi-check-circle text-success"></i> Inventory tracking</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Low stock alerts</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Reorder management</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Cost tracking</li>
+                    </ul>
+                    <a asp-controller="Consumables" asp-action="Index" class="btn btn-warning btn-lg mt-3">
+                        <i class="bi bi-arrow-right-circle"></i> Manage Consumables
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="bi bi-lightning-charge"></i> Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Assets" asp-action="Create" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="bi bi-plus-circle"></i><br />Add Hardware
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Software" asp-action="Create" class="btn btn-outline-success btn-lg w-100">
+                                <i class="bi bi-plus-circle"></i><br />Add Software
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Consumables" asp-action="Create" class="btn btn-outline-warning btn-lg w-100">
+                                <i class="bi bi-plus-circle"></i><br />Add Consumable
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Assets" asp-action="Dashboard" class="btn btn-outline-info btn-lg w-100">
+                                <i class="bi bi-bar-chart"></i><br />View Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="bi bi-star"></i> System Features</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-shield-check text-success"></i> Asset Management</h5>
+                            <ul>
+                                <li>Complete lifecycle tracking for hardware assets</li>
+                                <li>Detailed asset information and specifications</li>
+                                <li>User assignment and location tracking</li>
+                                <li>Warranty and purchase information</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-graph-up text-primary"></i> Reporting & Analytics</h5>
+                            <ul>
+                                <li>Comprehensive dashboard with key metrics</li>
+                                <li>Export capabilities for data analysis</li>
+                                <li>Historical tracking of all changes</li>
+                                <li>Low stock and expiration alerts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,102 @@
+@model IEnumerable<Asset.Models.Consumable>
+
+@{
+    ViewData["Title"] = "Low Stock Items";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-exclamation-triangle text-warning"></i> @ViewData["Title"]
+        </h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to All Items
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> <strong>Great!</strong> All consumables are adequately stocked.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <strong>Attention Required!</strong> 
+            The following @Model.Count() item(s) need to be reordered.
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Minimum Level</th>
+                                <th>Reorder Quantity</th>
+                                <th>Supplier</th>
+                                <th>Unit Price</th>
+                                <th>Total Cost</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var stockDeficit = item.MinimumStockLevel - item.QuantityInStock;
+                                var reorderQty = item.ReorderQuantity ?? stockDeficit;
+                                var totalCost = (item.UnitPrice ?? 0) * reorderQty;
+                                
+                                <tr class="table-warning">
+                                    <td>
+                                        <strong>@item.Name</strong>
+                                        @if (item.PartNumber != null)
+                                        {
+                                            <br /><small class="text-muted">@item.PartNumber</small>
+                                        }
+                                    </td>
+                                    <td>@item.Category</td>
+                                    <td class="text-danger fw-bold">
+                                        @item.QuantityInStock @item.UnitOfMeasure
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                    </td>
+                                    <td>@item.MinimumStockLevel @item.UnitOfMeasure</td>
+                                    <td class="fw-bold">
+                                        @reorderQty @item.UnitOfMeasure
+                                    </td>
+                                    <td>@item.Supplier</td>
+                                    <td>@(item.UnitPrice?.ToString("C") ?? "N/A")</td>
+                                    <td class="fw-bold">@totalCost.ToString("C")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@item.ConsumableId" class="btn btn-info" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.ConsumableId" class="btn btn-warning" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <td colspan="7" class="text-end"><strong>Estimated Total Reorder Cost:</strong></td>
+                                <td colspan="2">
+                                    <strong>
+                                        @Model.Sum(c => (c.UnitPrice ?? 0) * (c.ReorderQuantity ?? (c.MinimumStockLevel - c.QuantityInStock))).ToString("C")
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
